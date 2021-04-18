@@ -28,7 +28,7 @@ lane = {}
 
 class TrafficLane:
 
-    def __init__(y_level):
+    def __init__(self, y_level):
         
         self.y_level = y_level
         
