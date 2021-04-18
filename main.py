@@ -1,9 +1,11 @@
 import pygame
 import os
+import random
 
 ScreenWidth, ScreenHeight = 704, 704
 WIN = pygame.display.set_mode((ScreenWidth, ScreenHeight))
 pygame.display.set_caption("Frogger Game")
+FPS = 60 # Screen update speed
 
 '''Colors'''
 Green = (76, 163, 54)
@@ -21,7 +23,21 @@ BusRight = pygame.transform.flip(Bus_Image, True, False) # Flips bus so it faces
 BusLeft = pygame.transform.flip(Bus_Image, False, False) # Flip bus so it to the left
 
 
-FPS = 60 # Screen update speed
+'''Class for handling the traffic lanes'''
+lane = {}
+
+class TrafficLane:
+
+    def __init__(y_level):
+        
+        self.y_level = y_level
+        
+        if (random.randint(0,1) == 1): # Determines which direction the traffic will move
+            self.direction = "right"
+        else:
+            self.direction = "left"
+
+
 
 def drawScreen():
     WIN.fill(DarkGreen2) # Background
@@ -45,7 +61,7 @@ def main():
         for event in pygame.event.get():
               
               if event.type == pygame.QUIT:  # Quit Event
-                  truth = False
+                  GameLoop = False
               
               elif event.type == pygame.KEYDOWN: # Buttons Pressed
                   
