@@ -24,12 +24,13 @@ BusLeft = pygame.transform.flip(Bus_Image, False, False) # Flip bus so it to the
 
 
 '''Class for handling the traffic lanes'''
-lane = {}
+Lanes = {}
 
 class TrafficLane:
 
-    def __init__(self, y_level):
+    def __init__(self, y_level, name):
         
+        self.name = name
         self.y_level = y_level
         
         if (random.randint(0,1) == 1): # Determines which direction the traffic will move
@@ -54,6 +55,15 @@ def main():
 
     ScreenMoveUp = 0
     
+    LaneNum = 0
+    for y in range(1, 11):
+        #LaneName = "TrafficLane" + str(LaneNum)
+        x = y * 64
+        temp = TrafficLane(x, LaneNum)
+        LaneNum += 1
+        Lanes[temp.name] = [temp.y_level, temp.direction]
+
+
     while GameLoop == True: # Main Game Loop
         
         clock.tick(FPS)
@@ -81,6 +91,9 @@ def main():
             
             FroggerY += 1
             
+            for item in Lanes:
+                Lanes[item][0] +=1
+
             ScreenMoveUp = 0
 
         if FroggerY >= ScreenHeight: # If frogger gets below the bottom of the screen
@@ -89,7 +102,10 @@ def main():
 
 
     pygame.quit() # Stops pygame once main game loop is over
-
+    
+    for item in Lanes:
+        print(str(item) + " : " + str(Lanes[item][0]))
+    
 
 if __name__ == "__main__":
     main() # Runs the main function
