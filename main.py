@@ -97,6 +97,7 @@ def main():
         # Variables for next lane handling
         NextLaneNum = -1
         YLevelToBeat = 0
+        AlreadyHaveLane = 0
 
         ScreenMoveUp += 1
         if ScreenMoveUp == 10: # Slowly moves screen elements down.
@@ -104,16 +105,21 @@ def main():
             FroggerY += 1
 
             for item in Lanes: # Handling the upcoming lane
-                if (Lanes[item][0] > YLevelToBeat):
+                if (Lanes[item][0] > YLevelToBeat and Lanes[item][0] <= SCREENHEIGHT):
                     YLevelToBeat = Lanes[item][0]
-                    NextLaneNum = item.name
+                    NextLaneNum = item
                 Lanes[item][0] +=1
 
-            if (SCREENHEIGHT - YLevelToBeat > 0): # Creating the next lane
+            if (SCREENHEIGHT - YLevelToBeat > 0 and AlreadyHaveLane == 0): # Creating the next lane
                 if (NextLaneNum == 11):
                     print("We need lane 1")
+                    temp = TrafficLane(YLevelToBeat - SCREENHEIGHT, NextLaneNum + 1)
+                    Lanes[temp.name] = [temp.y_level, temp.direction] 
+
                 else:
                     print("We need the lane num (+1)")
+                    temp = TrafficLane(YLevelToBeat - SCREENHEIGHT, NextLaneNum + 1)
+                    Lanes[temp.name] = [temp.y_level, temp.direction] 
 
             ScreenMoveUp = 0
 
