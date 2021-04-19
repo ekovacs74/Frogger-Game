@@ -2,15 +2,15 @@ import pygame
 import os
 import random
 
-ScreenWidth, ScreenHeight = 704, 704
-WIN = pygame.display.set_mode((ScreenWidth, ScreenHeight))
+SCREENWIDTH, SCREENHEIGHT = 704, 704
+WIN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.display.set_caption("Frogger Game")
 FPS = 60 # Screen update speed
 
 '''Colors'''
-Green = (76, 163, 54)
-DarkGreen = (55, 115, 40)
-DarkGreen2 = (90, 135, 62)
+GREEN = (76, 163, 54)
+DARKGREEN1 = (55, 115, 40)
+DARKGREEN2 = (90, 135, 62)
 
 
 '''Chars'''
@@ -43,7 +43,7 @@ class TrafficLane: # Creating the class for the lanes
 
 
 def drawScreen():
-    WIN.fill(DarkGreen2) # Background
+    WIN.fill(DARKGREEN2) # Background
 
     # For things on the screen (Might make a separate function)
     for item in Lanes:
@@ -87,9 +87,9 @@ def main():
                       FroggerY -= 64
                   elif event.key == pygame.K_LEFT and FroggerX > 0: # Button for moving left with limits
                       FroggerX -= 64
-                  elif event.key == pygame.K_DOWN and FroggerY < ScreenHeight - FroggerHeight * 2: # Button for moving down with limits
+                  elif event.key == pygame.K_DOWN and FroggerY < SCREENHEIGHT - FroggerHeight * 2: # Button for moving down with limits
                       FroggerY += 64
-                  elif event.key == pygame.K_RIGHT and FroggerX < ScreenWidth - FroggerWidth: # Button for moving right with limits
+                  elif event.key == pygame.K_RIGHT and FroggerX < SCREENWIDTH - FroggerWidth: # Button for moving right with limits
                       FroggerX += 64
 
         drawScreen() # Draws what needs to be drawn for the game
@@ -109,7 +109,7 @@ def main():
                     NextLaneNum = item.name
                 Lanes[item][0] +=1
 
-            if (ScreenHeight - YLevelToBeat > 0): # Creating the next lane
+            if (SCREENHEIGHT - YLevelToBeat > 0): # Creating the next lane
                 if (NextLaneNum == 11):
                     print("We need lane 1")
                 else:
@@ -117,7 +117,7 @@ def main():
 
             ScreenMoveUp = 0
 
-        if FroggerY >= ScreenHeight: # If frogger gets below the bottom of the screen
+        if FroggerY >= SCREENHEIGHT: # If frogger gets below the bottom of the screen
             print("Game Over")
             GameLoop = False
 
