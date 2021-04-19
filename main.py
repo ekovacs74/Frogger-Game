@@ -22,13 +22,13 @@ Bus_Image = pygame.image.load(os.path.join('Assets', 'Schoolbus.png')) # Loading
 BusRight = pygame.transform.flip(Bus_Image, True, False) # Flips bus so it faces to the right
 BusLeft = pygame.transform.flip(Bus_Image, False, False) # Flip bus so it to the left
 
-Lane_Image = pygame.image.load(os.path.join('Assets', 'Road.png'))
+Lane_Image = pygame.image.load(os.path.join('Assets', 'Road.png')) # Image for the road
 
 
 '''Class for handling the traffic lanes'''
-Lanes = {}
+Lanes = {} # Dictionary for the lanes
 
-class TrafficLane:
+class TrafficLane: # Creating the class for the lanes
 
     def __init__(self, y_level, name):
 
@@ -53,6 +53,10 @@ def drawScreen():
 
     pygame.display.update() # Updates the screen
 
+
+
+'''Main Function'''
+
 def main():
     global FroggerY, FroggerX
     clock = pygame.time.Clock()
@@ -60,8 +64,8 @@ def main():
 
     ScreenMoveUp = 0
 
-    LaneNum = 0
-    for y in range(0, 11):
+    LaneNum = 0 
+    for y in range(0, 11): # Creating the lanes
             x = y * 64
             temp = TrafficLane(x, LaneNum)
             LaneNum += 1
@@ -90,13 +94,26 @@ def main():
 
         drawScreen() # Draws what needs to be drawn for the game
 
+        # Variables for next lane handling
+        NextLaneNum = -1
+        YLevelToBeat = 0
+
         ScreenMoveUp += 1
         if ScreenMoveUp == 10: # Slowly moves screen elements down.
 
             FroggerY += 1
 
-            for item in Lanes:
+            for item in Lanes: # Handling the upcoming lane
+                if (Lanes[item][0] > YLevelToBeat):
+                    YLevelToBeat = Lanes[item][0]
+                    NextLaneNum = item.name
                 Lanes[item][0] +=1
+
+            if (ScreenHeight - YLevelToBeat > 0): # Creating the next lane
+                if (NextLaneNum == 11):
+                    print("We need lane 1")
+                else:
+                    print("We need the lane num (+1)")
 
             ScreenMoveUp = 0
 
@@ -107,7 +124,7 @@ def main():
 
     pygame.quit() # Stops pygame once main game loop is over
 
-    for item in Lanes:
+    for item in Lanes: # Debug
         print(str(item) + " : " + str(Lanes[item][0]))
 
 
