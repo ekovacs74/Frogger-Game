@@ -2,6 +2,8 @@ import pygame
 import os
 import random
 
+os.system("cls")
+
 SCREENWIDTH, SCREENHEIGHT = 704, 704
 WIN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 pygame.display.set_caption("Frogger Game")
@@ -14,8 +16,13 @@ DARKGREEN2 = (90, 135, 62)
 
 
 '''Chars'''
-Frogger_Image = pygame.image.load(os.path.join('Assets', 'Frogger.png')) # Loading image for Frogger
+Frogger_Image = pygame.image.load(os.path.join('Assets', 'Froggy.png')) # Loading image for Frogger
 FroggerX, FroggerY, FroggerWidth, FroggerHeight = 320, 576, 64, 64 # Properties of Frogger
+
+FroggerUp = pygame.transform.scale(Frogger_Image, (FroggerWidth, FroggerHeight)) # Setting frogger up for facing up
+FroggerDown = pygame.transform.rotate(Frogger_Image, 180) # Setting frogger up for facing down
+FroggerRight = pygame.transform.rotate(Frogger_Image, 270) # Setting frogger up for facing right
+FroggerLeft = pygame.transform.rotate(Frogger_Image, 90) # Setting frogger up for facing left
 Frogger = pygame.transform.scale(Frogger_Image, (FroggerWidth, FroggerHeight)) # Sacling Frogger
 
 Bus_Image = pygame.image.load(os.path.join('Assets', 'Schoolbus.png')) # Loading image for School Bus
@@ -42,6 +49,27 @@ class TrafficLane: # Creating the class for the lanes
 
 
 
+'''Class for handling the cars'''
+Cars = {} # Dictionary for the cars
+
+class Cars: # Creating the class for the cars
+
+    def __init__(self, lane, direction, speed, carNum):
+
+        self.lane = lane
+        self.direction = direction
+        self.speed = speed
+        self.carNum = carNum
+
+        imageSelector = random.randint(0,0)
+
+        if (imageSelector == 0):
+            if (self.direction == "right"):
+                self.image = BusRight
+            else:
+                self.image = BusLeft
+
+
 def drawScreen():
     WIN.fill(DARKGREEN2) # Background
 
@@ -58,6 +86,7 @@ def drawScreen():
 '''Main Function'''
 
 def main():
+    global Frogger, FroggerUp, FroggerDown, FroggerRight, FroggerLeft
     global FroggerY, FroggerX
     clock = pygame.time.Clock()
     GameLoop = True # Variable for the Main Game Loop
@@ -85,12 +114,16 @@ def main():
 
                   if event.key == pygame.K_UP and FroggerY > 0: # Button for moving up with limits
                       FroggerY -= 64
+                      Frogger = FroggerUp
                   elif event.key == pygame.K_LEFT and FroggerX > 0: # Button for moving left with limits
                       FroggerX -= 64
+                      Frogger = FroggerLeft
                   elif event.key == pygame.K_DOWN and FroggerY < SCREENHEIGHT - FroggerHeight * 2: # Button for moving down with limits
                       FroggerY += 64
+                      Frogger = FroggerDown
                   elif event.key == pygame.K_RIGHT and FroggerX < SCREENWIDTH - FroggerWidth: # Button for moving right with limits
                       FroggerX += 64
+                      Frogger = FroggerRight
 
         drawScreen() # Draws what needs to be drawn for the game
 
@@ -112,12 +145,10 @@ def main():
 
             if (SCREENHEIGHT - YLevelToBeat > 0 and AlreadyHaveLane == 0): # Creating the next lane
                 if (NextLaneNum == 11):
-                    print("We need lane 1")
                     temp = TrafficLane(YLevelToBeat - SCREENHEIGHT, NextLaneNum + 1)
                     Lanes[temp.name] = [temp.y_level, temp.direction] 
 
                 else:
-                    print("We need the lane num (+1)")
                     temp = TrafficLane(YLevelToBeat - SCREENHEIGHT, NextLaneNum + 1)
                     Lanes[temp.name] = [temp.y_level, temp.direction] 
 
