@@ -25,9 +25,9 @@ FroggerRight = pygame.transform.rotate(Frogger_Image, 270) # Setting frogger up 
 FroggerLeft = pygame.transform.rotate(Frogger_Image, 90) # Setting frogger up for facing left
 Frogger = pygame.transform.scale(Frogger_Image, (FroggerWidth, FroggerHeight)) # Sacling Frogger
 
-Bus_Image = pygame.image.load(os.path.join('Assets', 'Schoolbus.png')) # Loading image for School Bus
-BusRight = pygame.transform.flip(Bus_Image, True, False) # Flips bus so it faces to the right
-BusLeft = pygame.transform.flip(Bus_Image, False, False) # Flip bus so it to the left
+Bus_Image = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'Schoolbus.png')), (64, 64)) # Loading image for School Bus
+BusRight = pygame.transform.flip(Bus_Image, False, False) # Flips bus so it faces to the right
+BusLeft = pygame.transform.flip(Bus_Image, True, False) # Flip bus so it to the left
 
 Lane_Image = pygame.image.load(os.path.join('Assets', 'Road.png')) # Image for the road
 
@@ -50,16 +50,20 @@ class TrafficLane: # Creating the class for the lanes
 
 
 '''Class for handling the cars'''
-Cars = {} # Dictionary for the cars
+CarsLeft = {} # Dictionary for the cars coming from the left
+CarsRight = {} # Dictionary for the cars coming from the right
+CarNaming = 0 # This is for naming the cars
 
 class Cars: # Creating the class for the cars
 
-    def __init__(self, lane, direction, speed, carNum):
+    def __init__(self, x_level, y_level, direction, CarName):
 
-        self.lane = lane
         self.direction = direction
-        self.speed = speed
-        self.carNum = carNum
+        self.speed = random.randint(1, 3)
+        self.CarName = CarName
+        self.x_level = x_level
+        self.y_level = y_level
+    
 
         imageSelector = random.randint(0,0)
 
@@ -70,6 +74,7 @@ class Cars: # Creating the class for the cars
                 self.image = BusLeft
 
 
+'''Function for drawing the screen'''
 def drawScreen():
     WIN.fill(DARKGREEN2) # Background
 
@@ -78,6 +83,11 @@ def drawScreen():
         WIN.blit(Lane_Image, (0, Lanes[item][0]))
 
     WIN.blit(Frogger, (FroggerX, FroggerY))
+
+    for car in CarsLeft:
+        WIN.blit(CarsLeft[car][5], (CarsLeft[car][0], CarsLeft[car][1]))
+    for car in CarsRight:
+        WIN.blit(CarsRight[car][5], (CarsRight[car][0], CarsRight[car][1]))
 
     pygame.display.update() # Updates the screen
 
@@ -88,6 +98,7 @@ def drawScreen():
 def main():
     global Frogger, FroggerUp, FroggerDown, FroggerRight, FroggerLeft
     global FroggerY, FroggerX
+    global CarNaming
     clock = pygame.time.Clock()
     GameLoop = True # Variable for the Main Game Loop
 
@@ -96,9 +107,9 @@ def main():
     LaneNum = 0 
     for y in range(0, 11): # Creating the lanes
             x = y * 64
-            temp = TrafficLane(x, LaneNum)
+            temp = TrafficLane(x, LaneNum) # Temporary variable for setting the object
             LaneNum += 1
-            Lanes[temp.name] = [temp.y_level, temp.direction]
+            Lanes[temp.name] = [temp.y_level, temp.direction] # Adding object to dictionary
 
 
     while GameLoop == True: # Main Game Loop
@@ -125,6 +136,17 @@ def main():
                       FroggerX += 64
                       Frogger = FroggerRight
 
+        for item in Lanes: # For handling the cars
+            if (random.randint(0,500) == 0): # Random chance of the car coming from the designated side.
+                if (Lanes[item][1] == "right"):
+                    temp = Cars(SCREENWIDTH, Lanes[item][0], "right", CarNaming)
+                    CarNaming += 1
+                    CarsRight[CarNaming] = [temp.x_level, temp.y_level, temp.direction, temp.CarName, temp.speed, temp.image]
+                if (Lanes[item][1] == "left"):
+                    temp = Cars(0, Lanes[item][0], "left", CarNaming)
+                    CarNaming += 1
+                    CarsLeft[CarNaming] = [temp.x_level, temp.y_level, temp.direction, temp.CarName, temp.speed, temp.image]
+
         drawScreen() # Draws what needs to be drawn for the game
 
         # Variables for next lane handling
@@ -144,19 +166,34 @@ def main():
                 Lanes[item][0] +=1
 
             if (SCREENHEIGHT - YLevelToBeat > 0 and AlreadyHaveLane == 0): # Creating the next lane
-                if (NextLaneNum == 11):
+                if (NextLaneNum == 11): # Specific lane number for when it comes after lane 11
                     temp = TrafficLane(YLevelToBeat - SCREENHEIGHT, NextLaneNum + 1)
                     Lanes[temp.name] = [temp.y_level, temp.direction] 
-
-                else:
+                else: # For all the other lanes
                     temp = TrafficLane(YLevelToBeat - SCREENHEIGHT, NextLaneNum + 1)
-                    Lanes[temp.name] = [temp.y_level, temp.direction] 
+                    Lanes[temp.name] = [temp.y_level, temp.direction]
 
-            ScreenMoveUp = 0
+            for car in CarsLeft:
+                CarsLeft[car][1] += 1
+                CarsLeft[car][0] += CarsLeft[car][4]
+            for car in CarsRight:
+                CarsRight[car][1] += 1
+                CarsRight[car][0] -= CarsRight[car][4]
 
+            ScreenMoveUp = 0 # Resetting the variable for the next game loop
+
+        '''Conditionals that determine if frogger dies'''
         if FroggerY >= SCREENHEIGHT: # If frogger gets below the bottom of the screen
             print("Game Over")
             GameLoop = False
+
+        for car in CarsLeft:
+            if (CarsLeft[car][1] == FroggerY and (FroggerX - CarsLeft[car][0] <= 63 and CarsLeft[car][0] - FroggerX <= 63)):
+                GameLoop = False
+        for car in CarsRight:
+            if (CarsRight[car][1] == FroggerY and (FroggerX - CarsRight[car][0] <= 63 and CarsRight[car][0] - FroggerX <= 63)):
+                GameLoop = False
+
 
 
     pygame.quit() # Stops pygame once main game loop is over
