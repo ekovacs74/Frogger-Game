@@ -52,6 +52,8 @@ class TrafficLane: # Creating the class for the lanes
 '''Class for handling the cars'''
 CarsLeft = {} # Dictionary for the cars coming from the left
 CarsRight = {} # Dictionary for the cars coming from the right
+DelCarsRight = []
+DelCarsLeft = []
 CarNaming = 0 # This is for naming the cars
 
 class Cars: # Creating the class for the cars
@@ -59,11 +61,11 @@ class Cars: # Creating the class for the cars
     def __init__(self, x_level, y_level, direction, CarName):
 
         self.direction = direction
-        self.speed = random.randint(1, 3)
+        self.speed = random.randint(2, 6)
         self.CarName = CarName
         self.x_level = x_level
         self.y_level = y_level
-    
+
 
         imageSelector = random.randint(0,0)
 
@@ -72,7 +74,6 @@ class Cars: # Creating the class for the cars
                 self.image = BusRight
             else:
                 self.image = BusLeft
-
 
 '''Function for drawing the screen'''
 def drawScreen():
@@ -104,7 +105,7 @@ def main():
 
     ScreenMoveUp = 0
 
-    LaneNum = 0 
+    LaneNum = 0
     for y in range(0, 11): # Creating the lanes
             x = y * 64
             temp = TrafficLane(x, LaneNum) # Temporary variable for setting the object
@@ -137,13 +138,13 @@ def main():
                       Frogger = FroggerRight
 
         for item in Lanes: # For handling the cars
-            if (random.randint(0,500) == 0): # Random chance of the car coming from the designated side.
+            if (random.randint(0,6000) == 0): # Random chance of the car coming from the designated side.
                 if (Lanes[item][1] == "right"):
-                    temp = Cars(SCREENWIDTH, Lanes[item][0], "right", CarNaming)
+                    temp = Cars(SCREENWIDTH, Lanes[item][0], "right", CarNaming + 1)
                     CarNaming += 1
                     CarsRight[CarNaming] = [temp.x_level, temp.y_level, temp.direction, temp.CarName, temp.speed, temp.image]
                 if (Lanes[item][1] == "left"):
-                    temp = Cars(0, Lanes[item][0], "left", CarNaming)
+                    temp = Cars(0, Lanes[item][0], "left", CarNaming + 1)
                     CarNaming += 1
                     CarsLeft[CarNaming] = [temp.x_level, temp.y_level, temp.direction, temp.CarName, temp.speed, temp.image]
 
@@ -168,7 +169,7 @@ def main():
             if (SCREENHEIGHT - YLevelToBeat > 0 and AlreadyHaveLane == 0): # Creating the next lane
                 if (NextLaneNum == 11): # Specific lane number for when it comes after lane 11
                     temp = TrafficLane(YLevelToBeat - SCREENHEIGHT, NextLaneNum + 1)
-                    Lanes[temp.name] = [temp.y_level, temp.direction] 
+                    Lanes[temp.name] = [temp.y_level, temp.direction]
                 else: # For all the other lanes
                     temp = TrafficLane(YLevelToBeat - SCREENHEIGHT, NextLaneNum + 1)
                     Lanes[temp.name] = [temp.y_level, temp.direction]
@@ -176,11 +177,26 @@ def main():
             for car in CarsLeft:
                 CarsLeft[car][1] += 1
                 CarsLeft[car][0] += CarsLeft[car][4]
+                if ((CarsLeft[car][0] > SCREENWIDTH) or CarsLeft[car][1] > SCREENHEIGHT) and (car not in DelCarsLeft):
+                    DelCarsLeft.append(car)
+                    print(str(car) + " at y-level " + str(CarsLeft[car][1]))
             for car in CarsRight:
                 CarsRight[car][1] += 1
                 CarsRight[car][0] -= CarsRight[car][4]
+                if ((CarsRight[car][0] < 0 - 64) or CarsRight[car][1] > SCREENHEIGHT) and (car not in DelCarsRight):
+                    DelCarsRight.append(car)
+                    print(str(car) + " at y-level " + str(CarsRight[car][1]))
+
 
             ScreenMoveUp = 0 # Resetting the variable for the next game loop
+
+        for car in DelCarsRight:
+            CarsRight.pop(car)
+        for car in DelCarsLeft:
+            CarsLeft.pop(car)
+
+        DelCarsRight.clear()
+        DelCarsLeft.clear()
 
         '''Conditionals that determine if frogger dies'''
         if FroggerY >= SCREENHEIGHT: # If frogger gets below the bottom of the screen
@@ -200,6 +216,13 @@ def main():
 
     for item in Lanes: # Debug
         print(str(item) + " : " + str(Lanes[item][0]))
+
+    print("\n")
+    print(DelCarsRight)
+    print(DelCarsLeft)
+    print("\n")
+    print(CarsRight)
+    print(CarsLeft)
 
 
 if __name__ == "__main__":
